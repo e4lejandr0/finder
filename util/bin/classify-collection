@@ -1,0 +1,44 @@
+#!/bin/bash
+
+main() {
+
+    image_count="$(get_file_count "${PROJECT_DIR}/data/images")"
+    current_idx=1
+
+    for current_image in "${PROJECT_DIR}/data/images"/*; do
+        if [ -d "${current_image}" ]; then
+            continue
+        fi
+
+        banner
+        classify-image "${current_image}"
+        current_idx="$((current_idx+1))"
+        clear
+    done
+}
+
+banner() {
+
+        good_count="$(get_file_count "${PROJECT_DIR}/data/images/good")"
+        bad_count="$(get_file_count "${PROJECT_DIR}/data/images/bad")"
+        total_count="$((good_count + bad_count))"
+        good_percentage="$(echo "scale=4; ${good_count}.0/${total_count}.0 * 100" | bc)"
+        bad_percentage="$(echo "scale=4; ${bad_count}.0/${total_count}.0 * 100" | bc)"
+        printf '*************************************tinder-classifier***********************************\n'
+        printf 'current image: %s \n' "${current_image}"
+        printf 'session: %05d/%05d\n' "${current_idx}" "${image_count}"
+        printf 'good:    %05d | %02.2f%%\n' "${good_count}" "${good_percentage}"
+        printf 'bad:     %05d | %02.2f%%\n' "${bad_count}" "${bad_percentage}"
+        printf 'total:   %05d\n' "$((good_count + bad_count))"
+        printf '*****************************************************************************************\n'
+    
+}
+
+get_file_count() {
+
+    Dir="${1}"
+
+    find "${Dir}" -maxdepth 1 -type f | wc -l
+}
+
+main "$@"

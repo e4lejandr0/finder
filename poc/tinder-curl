@@ -1,0 +1,10 @@
+#!/bin/bash
+
+printf 'Params: %s\n' "$@"
+TinderUrl="https://api.gotinder.com"
+Params=("${@}")
+echo "${#Params[@]}"
+Endpoint="${Params[ ${#Params[@]}-1]}"
+shift
+unset 'Params[${#}-1]'
+curl -H @headers.txt -H "X-Auth-Token: $(cat code.txt)" "${TinderUrl}/${Endpoint}" ${Params:+"${Params[@]}"}

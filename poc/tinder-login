@@ -1,0 +1,5 @@
+#!/bin/bash
+
+AppID=574726620043991
+LoginUrl='https://www.facebook.com/v6.0/dialog/oauth'
+printf '%s\n' "${LoginUrl}?client_id=${AppID}&redirect_uri=https://www.facebook.com/connect/login_success.html?state=1"

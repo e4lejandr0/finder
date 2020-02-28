@@ -1,0 +1,3 @@
+Accept: application/json
+Content-Type: application/json
+User-Agent: Tinder/3.0.4 (iPhone; iOS 7.1; Scale/2.00)

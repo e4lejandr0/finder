@@ -1,0 +1,50 @@
+#!/bin/bash
+
+main() {
+
+    GOOD=0
+    BAD=1
+    Image="${1}"
+
+    trap cleanup EXIT
+    trap cleanup SIGTERM
+    trap cleanup SIGQUIT
+    trap cleanup SIGABRT
+
+    window_name="${RANDOM}_$$"
+    wmctrl -T "${window_name}" -r ':ACTIVE:'
+
+    feh -x --geometry '1920x1080+0+0' "${Image}" & 
+    image_viewer="$!"
+    sleep '0.1s'
+    wmctrl -a "${window_name}"
+
+    while true; do
+        printf 'good/bad?(g/b) '
+        read response
+        echo "${response}"
+        case "${response}" in
+            g|G)
+                printf 'classified as good\n'
+                mv "${Image}" "${PROJECT_DIR}/data/images/good"
+                return "${GOOD}"
+                ;;
+            b|B)
+                printf 'classified as bad\n'
+                mv "${Image}" "${PROJECT_DIR}/data/images/bad"
+                return "${BAD}"
+                ;;
+            *)
+                printf 'not an option\n'
+                ;;
+        esac
+    done
+
+    kill "${image_viewer}"
+}
+
+cleanup() {
+
+    kill "${image_viewer}"
+}
+main "$@"
