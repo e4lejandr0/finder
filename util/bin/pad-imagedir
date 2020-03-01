@@ -1,0 +1,16 @@
+#!/bin/bash
+
+main() {
+
+    ImageDir="${1}"
+    Width="${2:-1080}"
+    Height="${3:-1080}"
+    PadDir="${PROJECT_DIR}/images/padded"
+
+    mkdir "${PadDir}"
+    find "${ImageDir}" -maxdepth 1 -type f | \
+        xargs -P12 -I@ pad-image ${Width} ${Height}  @
+            
+}
+
+main "$@"

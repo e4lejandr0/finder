@@ -1,0 +1,87 @@
+#!/usr/bin/env python
+import os
+import sys
+
+import cv2
+
+
+# pad and scale images for ease of processing
+# usage: pad-image <width> <height> <input>
+# output: ${PROJECT_DIR}/data/images/padded
+
+def scale(image, new_width, new_height):
+    image_width = len(image[0])
+    image_height = len(image)
+
+    delta_width = abs(new_width - image_width)
+    delta_height = abs(new_height - image_height)
+
+    width_ratio = int(delta_width / image_width * 100)
+    height_ratio = int(delta_height / image_height * 100)
+    scaling_ratio = max(width_ratio, height_ratio)
+    
+    new_imgwidth = min(int(image_width - (image_width * scaling_ratio/100)), new_width)
+    new_imgheight = min(int(image_height - (image_height * scaling_ratio/100)), new_height)
+    new_size = (new_imgwidth, new_imgheight)
+                
+
+    print(f"[SCALE] image size: {image_width} x {image_height}")
+    print(f"[SCALE] scaling ratio: {scaling_ratio/100}")
+    print(f"[SCALE] resizing to: {new_imgwidth} x {new_imgheight}")
+    
+    
+    return cv2.resize(image, new_size, interpolation = cv2.INTER_AREA)
+
+def pad(image, new_height, new_width):
+    image_width = len(image[0])
+    image_height = len(image)
+
+    delta_width =  -image_width + new_width
+    delta_height = -image_height + new_height
+
+    print(f"[PAD] image size: {image_width} x {image_height}")
+    print(f"[PAD] padding to: {new_width} x {new_height}")
+    print(f"[PAD] applying delta: {delta_width} x {delta_height}")
+    if delta_width <= 0 and delta_height <= 0:
+        print(f"[PAD] image does not need padding")
+        return image
+
+
+    return cv2.copyMakeBorder(image,
+        delta_height//2,
+        delta_height//2,
+        delta_width//2,
+        delta_width//2,
+        cv2.BORDER_CONSTANT)
+
+def main():
+    new_height = int(sys.argv[1])
+    new_width = int(sys.argv[2])
+    input_path = sys.argv[3]
+    output_path = os.path.basename(input_path)
+    image = cv2.imread(input_path)
+    output_path = os.getenv('PROJECT_DIR') + f"/data/images/padded/{output_path}"
+
+    image_width = len(image)
+    image_height = len(image[0])
+
+
+    if image_width > new_width or image_height > new_height:
+        image = scale(image, new_width, new_height)
+        image = pad(image, new_width, new_height)
+    else:
+        image = pad(image, new_width, new_height)
+
+
+    print(f"input: {input_path}")
+    print(f"output: {output_path}")
+
+
+    cv2.imwrite(output_path, image)
+    
+    
+
+if __name__ == '__main__':
+    main()
+
+
